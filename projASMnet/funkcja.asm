@@ -1,4 +1,5 @@
 .386
+.MMX
 .MODEL FLAT, C
 .DATA
 	tabznak byte 256 dup (0)
@@ -8,12 +9,12 @@
 	root dd 0
 	temp_root dd 0
 .CODE
-utworz_tablice PROC uses ebx input_text: BYTE
+utworz_tablice PROC uses ebx input_text:DWORD, output_data:DWORD
 		push esi
 		push edi
 		push ebp
 		mov ecx, 0
-		mov ebx, eax
+		mov ebx, input_text
 next_znak:
 		mov al, [ebx]
 porownaj_znak:
@@ -84,6 +85,7 @@ wieksze:
 
 koniec_tablicy:
 		call utworz_drzewo
+		call kompresuj
 		lea eax, tabznak
 		pop ebp
 		pop edi
@@ -104,11 +106,15 @@ utworz_drzewo PROC
 		dec ecx
 		add ebx, 4
 		lea edx, tabznak[ecx]
-		mov [ebx], edx
+		mov eax, 0
+		mov al, [edx]
+		mov [ebx], al
 		add ebx, 4
 		inc ecx
 		lea edx, tabznak[ecx] 
-		mov [ebx], edx
+		mov eax, 0
+		mov al, [edx]
+		mov [ebx], al
 		mov edx, temp_root
 		mov root, edx
 
@@ -137,13 +143,17 @@ add_value:
 		mov [ebx], eax
 		add ebx, 4
 		lea edx, tabznak[ecx]
-		mov [ebx], edx
+;--------------------------------------
+		mov eax, 0
+		mov al, [edx]
+		mov [ebx], al
+;--------------------------------------
 		mov edx, temp_root
 		mov root, edx
 		mov esi, rozmiar_tab
 		dec esi
 		cmp ecx, esi
-		je koniec
+		je koniec_utworz_drzewo
 		jmp next_value
 
 create_node:
@@ -155,11 +165,19 @@ create_node:
 		add ebx, 4
 		dec ecx
 		lea edx, tabznak[ecx]
-		mov [ebx], edx
+;--------------------------------------
+		mov eax, 0
+		mov al, [edx]
+		mov [ebx], al
+;--------------------------------------
 		add ebx, 4
 		inc ecx
 		lea edx, tabznak[ecx]
-		mov [ebx], edx
+;--------------------------------------
+		mov eax, 0
+		mov al, [edx]
+		mov [ebx], al
+;--------------------------------------
 
 
 	;podepnij nowy wierzcholek do drzewa
@@ -181,11 +199,36 @@ create_node:
 		mov eax, rozmiar_tab
 		dec eax
 		cmp ecx, eax
-		je koniec
+		je koniec_utworz_drzewo
 		jmp next_value
 
-koniec:
+koniec_utworz_drzewo:
 		mov ebx, root
 ret
 utworz_drzewo ENDP
+
+;kompresja danych
+kompresuj PROC
+
+;		push input_text
+
+;		mov edx, root
+;		mov temp_root, edx
+;		mov ebx, edx
+;		add ebx, 4
+;		mov edx, [ebx]
+;		mov eax, [edx]
+;		movd mm0, eax
+;		add ebx, 4
+;		mov edx, [ebx]
+;		mov eax, [edx]
+;		movd mm1, eax
+		;movd mm2, input_text
+
+
+koniec_kompresuj:
+		
+ret
+kompresuj ENDP
+
 END
