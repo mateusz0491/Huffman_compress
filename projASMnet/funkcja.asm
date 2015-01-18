@@ -8,7 +8,7 @@
 	root dd 0
 	temp_root dd 0
 .CODE
-utworz_tablice PROC
+utworz_tablice PROC uses ebx input_text: BYTE
 		push esi
 		push edi
 		push ebp
@@ -120,9 +120,14 @@ next_value:
 		
 	;mov ebx, root
 		mov edi, root
+		mov esi, rozmiar_tab
+		dec esi
+		cmp ecx, esi
+		je add_value
 		cmp eax, [edi]
 		jl create_node
-		
+
+add_value:		
 		mov eax, [edi]
 		add eax, tabil[4*ecx]
 		mov [ebx], eax
@@ -135,6 +140,10 @@ next_value:
 		mov [ebx], edx
 		mov edx, temp_root
 		mov root, edx
+		mov esi, rozmiar_tab
+		dec esi
+		cmp ecx, esi
+		je koniec
 		jmp next_value
 
 create_node:
@@ -153,7 +162,7 @@ create_node:
 		mov [ebx], edx
 
 
-		;podepnij nowy wierzcholek do drzewa
+	;podepnij nowy wierzcholek do drzewa
 		mov edi, root
 		mov eax, [edi]
 		mov edi, temp_root
@@ -168,6 +177,11 @@ create_node:
 		mov eax, temp_root
 		mov [ebx], eax
 		mov root, edi
+	;czy koniec tablicy
+		mov eax, rozmiar_tab
+		dec eax
+		cmp ecx, eax
+		je koniec
 		jmp next_value
 
 koniec:
