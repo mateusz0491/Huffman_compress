@@ -20,7 +20,7 @@ int main()
 		char* tab = new char[length];
 		char* tab_output = new char[length];
 		char c;
-		char d = '\0';
+		char d = 0x00;
 	//	memcpy(tab, &d, sizeof(char)*length);
 	//	memcpy(temp, &d, sizeof(char)* length);
 		int i = 0;
@@ -31,6 +31,7 @@ int main()
 			plik.get(c );
 			//tab[i] = c;
 			memmove(&tab[i], &c, sizeof(char));
+			memmove(&tab_output[i], &d, sizeof(char));
 			i++;
 		}
 

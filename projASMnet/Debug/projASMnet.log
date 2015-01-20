@@ -1,10 +1,10 @@
-﻿Build started 2015-01-18 22:26:09.
+﻿Build started 2015-01-20 22:39:35.
      1>Project "C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\projASMnet\projASMnet.vcxproj" on node 2 (Build target(s)).
      1>_MASM:
          Assembling funkcja.asm...
-         cmd.exe /C "C:\Users\Mateusz\AppData\Local\Temp\tmp851f95e1faac498f9c4e0e69b4b11447.cmd"
+         cmd.exe /C "C:\Users\Mateusz\AppData\Local\Temp\tmp38ea8c64e3be4674895a4dda29238f45.cmd"
          ml.exe /c /nologo /Zi /Fo"Debug\funkcja.obj" /W3 /errorReport:prompt  /Tafunkcja.asm
-     1>funkcja.asm(94): warning A6004: procedure argument or local not referenced : output_data
+     1>funkcja.asm(287): warning A6004: procedure argument or local not referenced : output_data
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
          Skipping... (no relevant changes detected)
@@ -17,4 +17,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.62
+Time Elapsed 00:00:00.67

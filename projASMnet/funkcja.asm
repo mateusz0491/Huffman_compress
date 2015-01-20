@@ -6,6 +6,7 @@
 	tabil dd 256 dup (0)
 	rozmiar_tab dd 0
 	znak byte 0
+	value_char dd 0
 	root dd 0
 	temp_root dd 0
 .CODE
@@ -84,6 +85,8 @@ wieksze:
 		jmp next_element
 
 koniec_tablicy:
+		push output_data
+		push input_text
 		call utworz_drzewo
 		call kompresuj
 		lea eax, tabznak
@@ -93,8 +96,10 @@ koniec_tablicy:
 ret
 utworz_tablice ENDP
 
-utworz_drzewo PROC
-		
+;----------------------------------------------------------------
+
+
+utworz_drzewo PROC input_text:DWORD, output_data:DWORD
 		mov ecx, 0
 		lea ebx, temp_root
 		add ebx, 4
@@ -204,28 +209,78 @@ create_node:
 
 koniec_utworz_drzewo:
 		mov ebx, root
+		push output_data
+		push input_text
+		call kompresuj
 ret
 utworz_drzewo ENDP
 
+;----------------------------------------
+
 ;kompresja danych
-kompresuj PROC
+kompresuj PROC input_text:DWORD, output_data:DWORD
 
-;		push input_text
+		mov edx, root
+		mov temp_root, edx
 
-;		mov edx, root
-;		mov temp_root, edx
-;		mov ebx, edx
-;		add ebx, 4
-;		mov edx, [ebx]
-;		mov eax, [edx]
-;		movd mm0, eax
-;		add ebx, 4
-;		mov edx, [ebx]
-;		mov eax, [edx]
-;		movd mm1, eax
-		;movd mm2, input_text
+		mov ecx, 0
+		mov ebx, input_text
+		mov al, [ebx]
+		mov znak, al
+		mov eax, 0ffffffffh
+		movd mm7, eax
+		movd mm6, eax
+		psllq mm6, 32
 
+ilosc_znaku:
+		mov eax, 0
+		mov al, tabznak[ecx]
+		cmp znak, al
+		je pobierz_ilosc
+		add ecx, 1
+		jmp ilosc_znaku
 
+pobierz_ilosc:
+		;movd mm0, tabil[4*ecx]
+
+		mov eax, 0
+		mov al, tabznak[ecx]
+		movd mm0, eax
+		psllq mm0, 32
+
+		mov eax, 0
+		mov al, tabznak[ecx]
+		movd mm1, eax
+		por mm0, mm1
+
+		add edx, 4
+		mov eax, [edx]
+		movd mm1, eax
+		psllq mm1, 32
+		add edx, 4
+		mov eax, [edx]
+		movd mm2, eax
+		por mm1, mm2
+		pcmpeqd mm1, mm2
+		movd eax, mm1
+		cmp eax, 0
+	;-------------------
+		je go_left_end
+		psrlq mm1, 32
+		movd eax, mm1
+		cmp eax, 0
+		je go_right_end
+		jmp go_down
+	;-------------------
+
+go_left_end:
+		nop
+
+go_right_end:
+		nop
+
+go_down:
+		nop
 koniec_kompresuj:
 		
 ret
