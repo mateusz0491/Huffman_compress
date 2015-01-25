@@ -4,10 +4,10 @@
 .DATA
 	tabznak byte 256 dup (0)
 	tabil dd 256 dup (0)
+	tab_compr_bit dd 256 dup (0)
+	tab_compr_bit_il byte 256 dup (0)
 	rozmiar_tab dd 0
-	znak byte 0
-	value_char dd 0
-	temp_i byte ?
+	temp_i dd 0
 	root dd 0
 	temp_root dd 0
 .CODE
@@ -89,7 +89,7 @@ koniec_tablicy:
 		push output_data
 		push input_text
 		call utworz_drzewo
-		call kompresuj
+		call utworz_tab_bitow
 		lea eax, tabznak
 		pop ebp
 		pop edi
@@ -210,121 +210,111 @@ create_node:
 
 koniec_utworz_drzewo:
 		mov ebx, root
-		push output_data
-		push input_text
-		call kompresuj
+		mov temp_root, ebx
+		push temp_root
+koniec:
 ret
 utworz_drzewo ENDP
 
 ;----------------------------------------
 
-;kompresja danych
-kompresuj PROC input_text:DWORD, output_data:DWORD
+utworz_tab_bitow PROC
 
-		mov edi, output_data
-		mov edx, root
-		mov temp_root, edx
-
-		mov temp_i, 31
 		mov ecx, 0
-		mov ebx, input_text
-		mov al, [ebx]
-		mov znak, al
-		mov eax, 0ffffffffh
-;		movd mm7, eax
-;		movd mm6, eax
-;		psllq mm6, 32
+		mov value_char, 0
+		mov temp_i, 0
+		push value_char
+		push temp_i
+		jge koniec_kodowania
+		call koduj_znaku
 
-ilosc_znaku:
-		mov eax, 0
-		mov al, tabznak[ecx]
-		cmp znak, al
-		je check_node
-		inc ecx
-		jmp ilosc_znaku
 
-check_node:
+koniec_kodowania:
+	
+ret
+utworz_tab_bitow ENDP
+
+koduj_znaku PROC
 		mov edx, temp_root
 
-		mov eax, 0
-		mov al, tabznak[ecx]
+		add edx, 4
+		mov eax, [edx]
 		movd mm0, eax
 		psllq mm0, 32
 
-		mov eax, 0
-		mov al, tabznak[ecx]
 		movd mm1, eax
 		por mm0, mm1
+	;	movq mm2, mm1
 
-		add edx, 4
-		mov eax, [edx]
-		movd mm1, eax
-		psllq mm1, 32
-		add edx, 4
-		mov eax, [edx]
-		movd mm2, eax
-		por mm1, mm2
-		pcmpeqd mm1, mm0
-		movd eax, mm1
-		cmp eax, 0FFFFh
-	;-------------------
-		je go_left_end
-		psrlq mm1, 32
-		movd eax, mm1
-		cmp eax, 0FFFFh
-		je go_right_end
-		jmp go_down
-	;-------------------
-go_down:
-		mov edx, temp_root
-		mov eax, [edx]
-		cmp tabil[4*ecx], eax
-		jl go_left
-		jge go_right
-		
+		mov ecx, 0
+next_el:
+		cmp ecx, rozmiar_tab
+		jge go_left
+		mov eax, 0
+		mov al, tabznak[ecx]
+		movd mm3, eax
+		psllq mm3, 32
+
+		inc ecx
+		cmp ecx, rozmiar_tab
+		je check_one
+		mov eax, 0
+		mov al, tabznak[ecx]
+		movd mm4, eax
+		por mm3, mm4
+
+		pcmpeqd mm3, mm0
+		movd eax, mm3
+		cmp eax, 0FFFFFFFFh
+		je left_value
+check_one:
+		psrlq mm3, 32
+		movd eax, mm3
+		cmp eax, 0FFFFFFFFh
+		je right_value
+		inc ecx
+		jmp next_el
 
 go_left:
+		mov edx, temp_root
 		add edx, 4
-		mov eax, [edx]
-		mov temp_root, eax
+		inc temp_i
+
+
+
+
+
+
+
+
+
+; porownaj wezel ze znakiem
+		pcmpeqd mm1, mm0
+		movd eax, mm1
+		cmp eax, 0FFFFFFFFh
+
+		psrlq mm1, 32
+		movd eax, mm1
+		cmp eax, 0FFFFFFFFh
+		je go_right_end
+
+		jmp go_down
+
+go_down:
+		mov edx, temp_root
+		add edx, 4
 		mov eax, 0
-		jmp add_to_output
-go_right:
-		add edx, 8
-		mov eax, [edx]
-		mov temp_root, eax
-		mov eax, 1
-
-add_to_output:
-		cmp temp_i, 0
-		jle next_addres		
-		
-set_bit:
-		mov ebx, [edi]
 		push ecx
-		mov cl, temp_i
-		shl  eax, cl
-		pop ecx
-		or ebx, eax
-		mov [edi], ebx
-		dec temp_i
-		jmp check_node
-
-next_addres:
-		add edi, 4
-		mov edx, 32
-		jmp set_bit
-
-go_left_end:
-		nop
-
-go_right_end:
-		nop
+		mov ecx, 0
+next_el:
+		mov al, tabznak[ecx]
+		cmp edx, eax
 
 
-koniec_kompresuj:
-		
 ret
-kompresuj ENDP
+koduj_znaku ENDP
+
+;----------------------------------------
+;kompresja danych
 
 END

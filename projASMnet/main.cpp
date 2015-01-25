@@ -21,8 +21,6 @@ int main()
 		char* tab_output = new char[length];
 		char c;
 		char d = 0x00;
-	//	memcpy(tab, &d, sizeof(char)*length);
-	//	memcpy(temp, &d, sizeof(char)* length);
 		int i = 0;
 		memset(tab, 0, length);
 		memset(tab_output, 0, length);
