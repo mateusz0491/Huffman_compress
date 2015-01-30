@@ -6,8 +6,12 @@
 	tabil dd 256 dup (0)
 	tab_compr_bit dd 256 dup (0)
 	tab_compr_bit_il byte 256 dup (0)
+
+;	temp_r dd 0
+;	temp_i dd 0
+;	value_char dd 0
+
 	rozmiar_tab dd 0
-	temp_i dd 0
 	root dd 0
 	temp_root dd 0
 .CODE
@@ -211,8 +215,6 @@ create_node:
 koniec_utworz_drzewo:
 		mov ebx, root
 		mov temp_root, ebx
-		push temp_root
-koniec:
 ret
 utworz_drzewo ENDP
 
@@ -221,22 +223,22 @@ utworz_drzewo ENDP
 utworz_tab_bitow PROC
 
 		mov ecx, 0
-		mov value_char, 0
-		mov temp_i, 0
-		push value_char
-		push temp_i
-		jge koniec_kodowania
+	;	mov value_char, 0
+	;	mov temp_i, 0
+		push 0
+		push 0
+		push root
 		call koduj_znaku
-
 
 koniec_kodowania:
 	
 ret
 utworz_tab_bitow ENDP
 
-koduj_znaku PROC
-		mov edx, temp_root
-
+koduj_znaku PROC temp_r:DWORD, temp_i:DWORD, value_char:DWORD
+		mov edx, temp_r
+go_start:
+		mov temp_r, edx
 		add edx, 4
 		mov eax, [edx]
 		movd mm0, eax
@@ -244,7 +246,7 @@ koduj_znaku PROC
 
 		movd mm1, eax
 		por mm0, mm1
-	;	movq mm2, mm1
+
 
 		mov ecx, 0
 next_el:
@@ -266,51 +268,27 @@ next_el:
 		pcmpeqd mm3, mm0
 		movd eax, mm3
 		cmp eax, 0FFFFFFFFh
-		je left_value
+		je right_value
 check_one:
 		psrlq mm3, 32
 		movd eax, mm3
 		cmp eax, 0FFFFFFFFh
-		je right_value
+		je left_value
 		inc ecx
 		jmp next_el
 
 go_left:
-		mov edx, temp_root
-		add edx, 4
+		mov ebx, temp_r
+		add ebx, 4
+		mov edx, [ebx]
 		inc temp_i
+		jmp go_start
+
+go_right:
 
 
-
-
-
-
-
-
-
-; porownaj wezel ze znakiem
-		pcmpeqd mm1, mm0
-		movd eax, mm1
-		cmp eax, 0FFFFFFFFh
-
-		psrlq mm1, 32
-		movd eax, mm1
-		cmp eax, 0FFFFFFFFh
-		je go_right_end
-
-		jmp go_down
-
-go_down:
-		mov edx, temp_root
-		add edx, 4
-		mov eax, 0
-		push ecx
-		mov ecx, 0
-next_el:
-		mov al, tabznak[ecx]
-		cmp edx, eax
-
-
+left_value:
+right_value:
 ret
 koduj_znaku ENDP
 

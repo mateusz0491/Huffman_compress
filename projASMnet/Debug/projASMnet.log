@@ -1,16 +1,22 @@
-﻿Build started 2015-01-25 18:52:02.
-     1>Project "C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\projASMnet\projASMnet.vcxproj" on node 2 (_MASM target(s)).
+﻿Build started 2015-01-30 12:21:53.
+     1>Project "C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\projASMnet\projASMnet.vcxproj" on node 2 (Build target(s)).
      1>_MASM:
          Assembling funkcja.asm...
-         cmd.exe /C "C:\Users\Mateusz\AppData\Local\Temp\tmp9bb8e3c6491d4b2f85ca1ddccad9bf51.cmd"
+         cmd.exe /C "C:\Users\Mateusz\AppData\Local\Temp\tmpdea764efbb89483c95d9ff53e1d4e930.cmd"
          ml.exe /c /nologo /Zi /Fo"Debug\funkcja.obj" /W3 /errorReport:prompt  /Tafunkcja.asm
-     1>funkcja.asm(268): error A2006: undefined symbol : go_right_end
-     1>funkcja.asm(276): error A2022: instruction operands must be the same size
-     1>funkcja.asm(217): warning A6004: procedure argument or local not referenced : input_text
-     1>funkcja.asm(217): warning A6004: procedure argument or local not referenced : output_data
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\BuildCustomizations\masm.targets(50,5): error MSB3721: The command "ml.exe /c /nologo /Zi /Fo"Debug\funkcja.obj" /W3 /errorReport:prompt  /Tafunkcja.asm" exited with code 1.
-     1>Done Building Project "C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\projASMnet\projASMnet.vcxproj" (_MASM target(s)) -- FAILED.
+     1>funkcja.asm(219): warning A6004: procedure argument or local not referenced : input_text
+     1>funkcja.asm(219): warning A6004: procedure argument or local not referenced : output_data
+     1>funkcja.asm(293): warning A6004: procedure argument or local not referenced : value_char
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         Skipping... (no relevant changes detected)
+         main.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\Debug\projASMnet.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\Debug\projASMnet.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\Debug\projASMnet.lib" /MACHINE:X86 Debug\main.obj
+         Debug\funkcja.obj
+         projASMnet.vcxproj -> C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\Debug\projASMnet.exe
+     1>Done Building Project "C:\Users\Mateusz\documents\visual studio 2013\Projects\projASMnet\projASMnet\projASMnet.vcxproj" (Build target(s)).
 
-Build FAILED.
+Build succeeded.
 
-Time Elapsed 00:00:00.25
+Time Elapsed 00:00:01.53
