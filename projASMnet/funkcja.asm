@@ -7,9 +7,9 @@
 	tab_compr_bit dd 256 dup (0)
 	tab_compr_bit_il byte 256 dup (0)
 
-;	temp_r dd 0
-;	temp_i dd 0
-;	value_char dd 0
+	temp_r dd 0
+	temp_i byte 0
+	value_char dd 0
 
 	rozmiar_tab dd 0
 	root dd 0
@@ -19,6 +19,7 @@ utworz_tablice PROC uses ebx input_text:DWORD, output_data:DWORD
 		push esi
 		push edi
 		push ebp
+		push esp
 		mov ecx, 0
 		mov ebx, input_text
 next_znak:
@@ -49,25 +50,25 @@ rowne:
 
 ;sortuj tablice
 sortuj_tablice:
-		mov eax, rozmiar_tab
+		mov edx, rozmiar_tab
 
 ; na koncu tablicy jest maksymalny element, sortuj do n-1
 petla_sortuj:
-		dec eax
-		cmp eax, 0
+		dec edx
+		cmp edx, 0
 		je koniec_tablicy
-		push eax
+	;	push eax
 		mov ecx, 0
 
 next_element:
-		pop eax
-		cmp ecx, eax
+	;	pop eax
+		cmp ecx, edx
 		jge petla_sortuj
-		push eax
+	;	push eax
 
-		mov eax, tabil[4*ecx]
+		mov ebx, tabil[4*ecx]
 		inc ecx
-		cmp eax, tabil[4*ecx]
+		cmp ebx, tabil[4*ecx]
 		jg wieksze
 
 		jmp next_element
@@ -90,11 +91,17 @@ wieksze:
 		jmp next_element
 
 koniec_tablicy:
-		push output_data
-		push input_text
 		call utworz_drzewo
 		call utworz_tab_bitow
-		lea eax, tabznak
+
+		push output_data
+		push input_text
+		call huffman_code
+
+		add esp, 8
+		mov eax, output_data
+		mov ebx, eax
+		pop esp
 		pop ebp
 		pop edi
 		pop esi
@@ -104,7 +111,7 @@ utworz_tablice ENDP
 ;----------------------------------------------------------------
 
 
-utworz_drzewo PROC input_text:DWORD, output_data:DWORD
+utworz_drzewo PROC
 		mov ecx, 0
 		lea ebx, temp_root
 		add ebx, 4
@@ -223,76 +230,166 @@ utworz_drzewo ENDP
 utworz_tab_bitow PROC
 
 		mov ecx, 0
-	;	mov value_char, 0
-	;	mov temp_i, 0
-		push 0
-		push 0
-		push root
+go_next:
+	;	mov eax, tabil[4*ecx]
+		cmp ecx, rozmiar_tab
+		je end_code
 		call koduj_znaku
+		inc ecx
+		jmp go_next
 
-koniec_kodowania:
-	
+end_code:
 ret
 utworz_tab_bitow ENDP
 
-koduj_znaku PROC temp_r:DWORD, temp_i:DWORD, value_char:DWORD
-		mov edx, temp_r
-go_start:
-		mov temp_r, edx
-		add edx, 4
-		mov eax, [edx]
+koduj_znaku PROC
+start:
+		lea eax, tab_compr_bit
+		mov esi, root
+		mov value_char, 0
+		mov temp_i, 0
+		mov eax, 0
+		mov al, tabznak[ecx]
 		movd mm0, eax
 		psllq mm0, 32
-
 		movd mm1, eax
 		por mm0, mm1
 
-
-		mov ecx, 0
-next_el:
-		cmp ecx, rozmiar_tab
-		jge go_left
+		mov ebx, root
+		mov temp_root, ebx
+go_next_node:
+		mov ebx, [temp_root]
+		mov eax, [ebx]
+		cmp eax, 0
+		jne go_node
 		mov eax, 0
-		mov al, tabznak[ecx]
-		movd mm3, eax
-		psllq mm3, 32
-
-		inc ecx
-		cmp ecx, rozmiar_tab
-		je check_one
-		mov eax, 0
-		mov al, tabznak[ecx]
-		movd mm4, eax
-		por mm3, mm4
-
-		pcmpeqd mm3, mm0
-		movd eax, mm3
-		cmp eax, 0FFFFFFFFh
-		je right_value
-check_one:
-		psrlq mm3, 32
-		movd eax, mm3
-		cmp eax, 0FFFFFFFFh
-		je left_value
-		inc ecx
-		jmp next_el
-
-go_left:
-		mov ebx, temp_r
-		add ebx, 4
-		mov edx, [ebx]
+		mov [esi], eax
+		jmp start
+go_node:
 		inc temp_i
-		jmp go_start
+		mov ebx, temp_root
+		add ebx, 4
+		mov eax, [ebx]
+		movd mm2, eax
+		psllq mm2, 32
+		add ebx, 4
+		mov eax, [ebx]
+		movd mm3, eax
+		por mm2, mm3
+
+		movq mm3, mm2
+
+		pcmpeqd mm2, mm0
+		movd eax, mm2
+		cmp eax, 0FFFFFFFFh
+		je go_right_end
+
+		psrlq mm2, 32
+		movd eax, mm2
+		cmp eax, 0FFFFFFFFh
+		je go_left_end
+
+		pcmpeqd mm3, mm4
+
+		movd eax, mm3
+		psrlq mm3, 32
+		movd ebx, mm3
+		;FFFFFFFF
+		cmp ebx, 0FFFFFFFFh
+		jne go_left
+
+		cmp eax, 0FFFFFFFFh
+		jne go_right
+		jmp start
+go_left:
+		mov edx, temp_root
+		add edx, 4
+		mov esi, edx
+		mov ebx, [edx]
+		mov temp_root, ebx
+		shl value_char, 1
+		mov edx, value_char
+		mov ebx, 0
+		or edx, ebx
+		mov value_char, edx
+		jmp go_next_node
 
 go_right:
+		mov edx, temp_root
+		add edx, 8
+		mov esi, edx
+		mov ebx, [edx]
+		mov temp_root, ebx
+		shl value_char, 1
+		mov edx, value_char
+		mov ebx, 1
+		or edx, ebx
+		mov value_char, edx
+		jmp go_next_node
 
+go_left_end:
+		mov ebx, temp_root
+		add ebx, 4
+		mov edx, 0
+		mov [ebx], edx
+		shl value_char, 1
+		mov edx, value_char
+		mov ebx, 0
+		or edx, ebx
 
-left_value:
-right_value:
+		mov tab_compr_bit[4*ecx], edx
+		mov al, temp_i
+		mov tab_compr_bit_il[4*ecx], al
+		jmp go_end
+
+go_right_end:
+		mov ebx, temp_root
+		mov edx, 0
+		mov [ebx], edx
+		add ebx, 8
+		mov [ebx], edx
+		shl value_char, 1
+		mov edx, value_char
+		mov ebx, 1
+		or edx, ebx
+
+		mov tab_compr_bit[4*ecx], edx
+		mov al, temp_i
+		mov tab_compr_bit_il[4*ecx], al
+		jmp go_end
+
+go_end:
 ret
 koduj_znaku ENDP
-
 ;----------------------------------------
 ;kompresja danych
+
+huffman_code PROC input_text:DWORD, output_data:DWORD, adr_back:DWORD
+
+		mov ebx, [input_text]
+		mov edx, [output_data]
+		lea eax, tabznak
+next_znak:
+		mov eax, 0
+		mov al, [ebx]
+		cmp al, 0
+		je koniec
+		mov ecx, 0
+next_el_tab:
+		cmp al, tabznak[ecx]
+		je koduj
+		inc ecx
+		jmp next_el_tab
+
+koduj:
+		mov eax, tab_compr_bit[4*ecx]
+		mov [edx], eax
+		add edx, 4
+		add ebx, 1
+		jmp next_znak
+koniec:
+		mov ebx, [output_data]
+ret
+huffman_code ENDP
 
 END

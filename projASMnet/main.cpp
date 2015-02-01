@@ -5,7 +5,7 @@
 using namespace std;
 extern "C" {
 	//deklaracja zewnetrznej funkcji dolinkowanej z asemblera
-	char* utworz_tablice(char* text, char* output_data);
+	char* utworz_tablice(char* text, long* output_data);
 }
 
 int main()
@@ -18,9 +18,9 @@ int main()
 		int length = plik.tellg();
 		plik.seekg(0, std::ios::beg);
 		char* tab = new char[length];
-		char* tab_output = new char[length];
+		long* tab_output = new long[length];
 		char c;
-		char d = 0x00;
+		long d = 0;
 		int i = 0;
 		memset(tab, 0, length);
 		memset(tab_output, 0, length);
@@ -29,7 +29,7 @@ int main()
 			plik.get(c );
 			//tab[i] = c;
 			memmove(&tab[i], &c, sizeof(char));
-			memmove(&tab_output[i], &d, sizeof(char));
+			memmove(&tab_output[i], &d, sizeof(long));
 			i++;
 		}
 
