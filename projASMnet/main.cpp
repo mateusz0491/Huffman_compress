@@ -11,7 +11,9 @@ extern "C" {
 int main()
 {
 	ifstream plik;
+	ofstream oplik;
 	plik.open("input.txt");
+	oplik.open("output.dat", ios::binary);
 	if (plik)
 	{
 		plik.seekg(0, std::ios::end);
@@ -36,7 +38,9 @@ int main()
 		cout << length << "\n";
 		cout << tab << "\n\n\n\n";
 		char* tekst = utworz_tablice(tab, tab_output);
+		oplik << tekst;
 		cout << tekst << "\n";
+		oplik.close();
 		plik.close();
 	}
 	return 0;

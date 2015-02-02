@@ -339,7 +339,7 @@ go_left_end:
 
 		mov tab_compr_bit[4*ecx], edx
 		mov al, temp_i
-		mov tab_compr_bit_il[4*ecx], al
+		mov tab_compr_bit_il[ecx], al
 		jmp go_end
 
 go_right_end:
@@ -355,7 +355,7 @@ go_right_end:
 
 		mov tab_compr_bit[4*ecx], edx
 		mov al, temp_i
-		mov tab_compr_bit_il[4*ecx], al
+		mov tab_compr_bit_il[ecx], al
 		jmp go_end
 
 go_end:
@@ -369,6 +369,8 @@ huffman_code PROC input_text:DWORD, output_data:DWORD, adr_back:DWORD
 		mov ebx, [input_text]
 		mov edx, [output_data]
 		lea eax, tabznak
+		pxor mm0, mm0
+		mov temp_i, 64
 next_znak:
 		mov eax, 0
 		mov al, [ebx]
@@ -383,9 +385,33 @@ next_el_tab:
 
 koduj:
 		mov eax, tab_compr_bit[4*ecx]
+		movd mm1, eax
+		mov eax, 0
+		mov al, temp_i
+		mov cl, tab_compr_bit_il[ecx]
+		sub al, cl
+		movd mm2, eax
+		psllq mm1, mm2
+		mov temp_i, al
+		por mm0, mm1
+		cmp al, 32
+		jl load_to_output
+	;	mov [edx], eax
+	;	add edx, 4
+		add ebx, 1
+		jmp next_znak
+
+load_to_output:
+		pxor mm3, mm3
+		por mm3, mm0
+		psrlq mm3, 32
+		movd eax, mm3
 		mov [edx], eax
 		add edx, 4
-		add ebx, 1
+		psllq mm0, 32
+		mov al, temp_i
+		add al, 32
+		mov temp_i, al
 		jmp next_znak
 koniec:
 		mov ebx, [output_data]
