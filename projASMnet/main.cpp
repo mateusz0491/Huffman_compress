@@ -11,9 +11,7 @@ extern "C" {
 int main()
 {
 	ifstream plik;
-	ofstream oplik;
 	plik.open("input.txt");
-	oplik.open("output.dat", ios::binary);
 	if (plik)
 	{
 		plik.seekg(0, std::ios::end);
@@ -42,6 +40,7 @@ int main()
 
 		cout << length << "\n";
 		cout << tab << "\n\n\n\n";
+<<<<<<< HEAD
 		char* tekst = utworz_tablice(tab, tab_output, table_char, table_code, table_code_il);
 		oplik << tekst;
 		cout << tekst << "\n";
@@ -49,6 +48,10 @@ int main()
 		cout << *table_char << "\n";
 		cout << &table_char << "\n";
 		oplik.close();
+=======
+		char* tekst = utworz_tablice(tab, tab_output);
+		cout << tekst << "\n";
+>>>>>>> parent of 1d91c76... Compress file
 		plik.close();
 	}
 	return 0;
