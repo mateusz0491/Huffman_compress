@@ -15,7 +15,7 @@
 	root dd 0
 	temp_root dd 0
 .CODE
-utworz_tablice PROC uses ebx input_text:DWORD, output_data:DWORD
+utworz_tablice PROC uses ebx input_text:DWORD, output_data:DWORD, table_char:DWORD, table_code:DWORD, table_code_il:DWORD
 		push esi
 		push edi
 		push ebp
@@ -99,6 +99,13 @@ koniec_tablicy:
 		call huffman_code
 
 		add esp, 8
+
+		lea eax, tabznak[0]
+		mov [table_char], eax
+		lea eax, tab_compr_bit[0]
+		mov [table_code], eax
+		lea eax, tab_compr_bit_il[0]
+		mov [table_code_il], eax
 		mov eax, output_data
 		mov ebx, eax
 		pop esp
