@@ -41,6 +41,7 @@ int main()
 		cout << length << "\n";
 		cout << tab << "\n\n\n\n";
 <<<<<<< HEAD
+<<<<<<< HEAD
 		char* tekst = utworz_tablice(tab, tab_output, table_char, table_code, table_code_il);
 		oplik << tekst;
 		cout << tekst << "\n";
@@ -48,6 +49,10 @@ int main()
 		cout << *table_char << "\n";
 		cout << &table_char << "\n";
 		oplik.close();
+=======
+		char* tekst = utworz_tablice(tab, tab_output);
+		cout << tekst << "\n";
+>>>>>>> parent of 1d91c76... Compress file
 =======
 		char* tekst = utworz_tablice(tab, tab_output);
 		cout << tekst << "\n";
